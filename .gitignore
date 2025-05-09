@@ -1,0 +1,9 @@
+# Builds files
+matmul.dSYM/
+
+# TXT files
+*.txt
+
+# MAC files
+.DS_Store
+**/.DS_Store
