@@ -125,14 +125,13 @@ void mult_seq(long *A, long *B, long *C, int n) {
  * Each (i,j) pair is computed in parallel threads
  */
 void mult_seq_par(long *A, long *B, long *C, int n) {
-    #pragma omp parallel for collapse(2) schedule(static)
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            long sum = 0;
-            for (int k = 0; k < n; k++) {
-                sum += A[i*n + k] * B[k*n + j];
+        for (int k = 0; k < n; k++) {
+            long aik = A[i*n + k];
+            for (int j = 0; j < n; j++) {
+                C[i*n + j] += aik * B[k*n + j];
             }
-            C[i*n + j] = sum;
         }
     }
 }
