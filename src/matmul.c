@@ -283,9 +283,43 @@ void mult_strassen(long *A, long *B, long *C, int n, int base_thresh) {
     for (size_t i = 0; i < sz; i++) C11[i] = P[i];
     for (size_t i = 0; i < sz; i++) C22[i] = P[i];
 
-    // 2) P2 = (A21+A22)*B11 …
-    // (rest of steps follow same pattern: compute S1/S2, call recursion, combine)
-    // [Remaining steps elided for brevity—see above implementation]
+    // 2) P2 = (A21 + A22)*B11
+    for(size_t i=0;i<sz;i++) S1[i] = A21[i] + A22[i];
+    mult_strassen(S1,B11,P,m,base_thresh);
+    for(size_t i=0;i<sz;i++) C21[i] = P[i];
+    for(size_t i=0;i<sz;i++) C11[i] += P[i];
+
+    // 3) P3 = A11*(B12 - B22)
+    for(size_t i=0;i<sz;i++) S2[i] = B12[i] - B22[i];
+    mult_strassen(A11,S2,P,m,base_thresh);
+    for(size_t i=0;i<sz;i++) C12[i] = P[i];
+    for(size_t i=0;i<sz;i++) C11[i] += P[i];
+
+    // 4) P4 = A22*(B21 - B11)
+    for(size_t i=0;i<sz;i++) S2[i] = B21[i] - B11[i];
+    mult_strassen(A22,S2,P,m,base_thresh);
+    for(size_t i=0;i<sz;i++) C22[i] += P[i];
+    for(size_t i=0;i<sz;i++) C12[i] -= P[i];
+
+    // 5) P5 = (A11 + A12)*B22
+    for(size_t i=0;i<sz;i++) S1[i] = A11[i] + A12[i];
+    mult_strassen(S1,B22,P,m,base_thresh);
+    for(size_t i=0;i<sz;i++) C12[i] += P[i];
+    for(size_t i=0;i<sz;i++) C22[i] += P[i];
+
+    // 6) P6 = (A21 - A11)*(B11 + B12)
+    for(size_t i=0;i<sz;i++) S1[i] = A21[i] - A11[i];
+    for(size_t i=0;i<sz;i++) S2[i] = B11[i] + B12[i];
+    mult_strassen(S1,S2,P,m,base_thresh);
+    for(size_t i=0;i<sz;i++) C11[i] -= P[i];
+    for(size_t i=0;i<sz;i++) C21[i] += P[i];
+
+    // 7) P7 = (A12 - A22)*(B21 + B22)
+    for(size_t i=0;i<sz;i++) S1[i] = A12[i] - A22[i];
+    for(size_t i=0;i<sz;i++) S2[i] = B21[i] + B22[i];
+    mult_strassen(S1,S2,P,m,base_thresh);
+    for(size_t i=0;i<sz;i++) C12[i] -= P[i];
+    for(size_t i=0;i<sz;i++) C22[i] += P[i];
 
     free(S1);
     free(S2);
